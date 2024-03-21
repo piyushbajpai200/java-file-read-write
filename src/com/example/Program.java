@@ -2,7 +2,10 @@ package com.example;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Program {
     public static void main(String[] args) {
@@ -28,6 +31,16 @@ public class Program {
         Path imageSourcePath = Path.of("src/image.gif");
         Path imageTargetPath = Path.of("src/copy.gif");
         copyBinaryFile(imageSourcePath, imageTargetPath);
+
+        //  NIO APIs (recommended for regular use)
+
+        readModern(filePath);
+
+        Path writePathModernBinary = Path.of("src/modern-binary.txt" );
+        writeModernBinary(writePathModernBinary, "Hello, friends".getBytes(StandardCharsets.UTF_8));
+
+        Path writePathModernStrings = Path.of("src/modern-lines.txt");
+        writeModernStrings(writePathModernStrings, List.of("Red", "Brown", "Green", "Blue", "Black", "Orange"));
     }
 
     static void readCharacter(Path filePath) {
@@ -121,6 +134,34 @@ public class Program {
             outputStream.write(data);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void readModern(Path filePath) {
+        try {
+            //  readString() for iterative string reading
+            //  readAllBytes() for binary files
+            List<String> lines = Files.readAllLines(filePath);
+            byte[] bytes = Files.readAllBytes(filePath);
+            System.out.println(bytes.length);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void writeModernBinary(Path filePath, byte[] content) {
+        try {
+            Files.write(filePath, content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void writeModernStrings(Path filePath, List<String> lines) {
+        try {
+            Files.write(filePath, lines);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
