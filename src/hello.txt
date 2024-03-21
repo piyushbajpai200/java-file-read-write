@@ -1,1 +1,4 @@
 Hello, world!
+Good morning
+Good evening
+Good day

@@ -20,14 +20,18 @@ public class Program {
         writeCharacter(writePathCharacter, "Hi there!".toCharArray());
 
         Path writePathString = Path.of("src/string.txt");
-        writeString(writePathString, "Hi there!");
+        writeString(writePathString, "Good evening!");
 
         Path writePathBinary = Path.of("src/binary.txt");
         writeBinary(writePathBinary, "Hi there!".getBytes(StandardCharsets.UTF_8));
+
+        Path imageSourcePath = Path.of("src/image.gif");
+        Path imageTargetPath = Path.of("src/copy.gif");
+        copyBinaryFile(imageSourcePath, imageTargetPath);
     }
 
     static void readCharacter(Path filePath) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
+        try (Reader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
             int ch;
 
             while ((ch = reader.read()) != -1) {
@@ -44,6 +48,7 @@ public class Program {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
             String line;
 
+            //  readLine() is available only on BufferedReader
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
             }
@@ -56,11 +61,11 @@ public class Program {
     }
 
     static void readBinary(Path filePath) {
-        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(filePath.toFile()))) {
+        try (InputStream stream = new BufferedInputStream(new FileInputStream(filePath.toFile()))) {
             int ch;
 
             while ((ch = stream.read()) != -1) {
-                System.out.println((char) ch);
+                System.out.print(ch);
             }
 
         } catch (FileNotFoundException e) {
@@ -72,7 +77,7 @@ public class Program {
 
 
     static void writeCharacter(Path filePath, char[] content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
 //          shorter
             writer.write(content);
 
@@ -88,7 +93,7 @@ public class Program {
     }
 
     static void writeString(Path filePath, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(filePath.toFile(), true))) {
             writer.write(content);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -98,8 +103,22 @@ public class Program {
     }
 
     static void writeBinary(Path filePath, byte[] content) {
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
             outputStream.write(content);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void copyBinaryFile(Path sourceFilePath, Path targetFilePath) {
+        try (
+                InputStream inputStream = new BufferedInputStream(new FileInputStream(sourceFilePath.toFile()));
+                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(targetFilePath.toFile()))
+        ) {
+            byte[] data = inputStream.readAllBytes();
+            outputStream.write(data);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
